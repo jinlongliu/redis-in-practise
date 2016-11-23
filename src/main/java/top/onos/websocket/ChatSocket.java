@@ -26,6 +26,7 @@ public class ChatSocket{
 
     private static int onlineCount = 0;
 
+    /*保存系统所有Sockets,一个Socket即一个Session会话*/
     private static CopyOnWriteArrayList<ChatSocket> chatSockets = new CopyOnWriteArrayList<ChatSocket>();
 
     private Session session;
@@ -35,6 +36,7 @@ public class ChatSocket{
     public void onOpen(Session session) {
         logger.info("A session opened");
         this.session = session;
+        /*游客加入保存会话同时计数+1*/
         chatSockets.add(this);
         addOnlineCount();
         String id = session.getId();
@@ -51,6 +53,7 @@ public class ChatSocket{
     @OnClose
     public void onClose(Session session) {
         logger.info("A session closed");
+        /*游客离开移除会话，计数减一*/
         chatSockets.remove(this);
         subOnlineCount();
         String id = session.getId();
@@ -76,10 +79,16 @@ public class ChatSocket{
 
         String toId = "";
         if (message != null && !message.trim().isEmpty()) {
+            /*分析发送消息是群聊还是单聊
+            * 如果消息以    {数字}/{消息内容}   格式组合，以/分隔，则是单聊
+            * {数字}为session id
+            * */
             int num = message.split("/").length;
             if (num > 1) {
+                /*单聊*/
                 toId = message.split("/")[0];
                 if (toId != null && !toId.trim().isEmpty()) {
+                    /*对所有会话遍历查找目标会话发送消息*/
                     for (ChatSocket chatSocket : chatSockets) {
                         try {
                             if (chatSocket.session.getId().equals(toId)) {
@@ -92,6 +101,7 @@ public class ChatSocket{
 
                 }
             } else {
+                /*群聊：遍历所有会话发送消息*/
                 for (ChatSocket chatSocket : chatSockets) {
                     try {
                         String id = session.getId();
@@ -117,6 +127,7 @@ public class ChatSocket{
     }
 
 
+    /*获取在线人数，同时操作在线人数*/
     public static synchronized int getOnlineCount() {
         return onlineCount;
     }
