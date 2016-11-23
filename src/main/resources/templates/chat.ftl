@@ -8,7 +8,7 @@
     };
     sock.onmessage = function(e) {
         console.log('message', e.data);
-        $("#msgHistory").append("Tom:\n&nbsp;&nbsp;&nbsp;&nbsp;" + e.data + "\n");
+        $("#msgHistory").append(e.data + "\n");
         var scrollHeight = $("#msgHistory")[0].scrollHeight;
         $("#msgHistory").scrollTop(scrollHeight);
     };
@@ -17,10 +17,16 @@
     };
 
     $(function () {
-        $(".btn").click(function () {
+        $(".btn-info").click(function () {
             var msg = $("#msgBox").val();
             sock.send(msg);
         });
+
+        $(".btn-danger").click(function () {
+            sock.close();
+        });
+
+
     });
 
     //    sock.send('test');
@@ -29,8 +35,14 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8">
-            <h1>聊天记录</h1>
-            <textarea id="msgHistory" rows="8" readonly style="width: 100%;resize: none"></textarea>
+            <div>
+                <h1>聊天记录</h1>
+                <textarea id="msgHistory" rows="8" readonly style="width: 100%;resize: none"></textarea>
+            </div>
+
+        </div>
+        <div class="ol-md-4">
+            <button class="btn btn-danger push-right"><span class="glyphicon glyphicon-log-out"></span> 退出</button>
         </div>
     </div>
     <div class="row">
@@ -38,9 +50,7 @@
             <h4>输入框</h4>
             <textarea id="msgBox" rows="4" style="width: 100%;resize: none"  placeholder="在此输入消息"></textarea>
         </div>
-        <div class="col-md-4">
 
-        </div>
     </div>
     <div class="row">
         <div class="col-md-8">
