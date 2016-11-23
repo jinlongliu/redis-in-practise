@@ -18,9 +18,11 @@ public class Receiver {
         this.latch = latch;
     }
 
-    public void receiveMessage(String message) {
+    public void receiveMessage(String message, String topic) {
+        /*订阅Redis消息，发送给所有WebSocket，实现群发，消息记录在Redis Server*/
         ChatSocket.sendAll(message);
         logger.info("Received:" + message);
+        logger.info("Topic:" + topic);
         latch.countDown();
     }
 }
