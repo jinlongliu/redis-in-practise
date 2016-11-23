@@ -2,6 +2,8 @@ package top.onos.websocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.OnClose;
@@ -20,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @ServerEndpoint("/chatOnline")
 @Component
+//@ComponentScan
 public class ChatSocket{
 
     private static final Logger logger = LoggerFactory.getLogger(ChatSocket.class);
@@ -30,6 +33,9 @@ public class ChatSocket{
     private static CopyOnWriteArrayList<ChatSocket> chatSockets = new CopyOnWriteArrayList<ChatSocket>();
 
     private Session session;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
 
     @OnOpen
@@ -48,6 +54,7 @@ public class ChatSocket{
             }
         }
         logger.info(id + "  online");
+//        stringRedisTemplate.convertAndSend("chat", id +" online");
     }
 
     @OnClose
@@ -119,6 +126,19 @@ public class ChatSocket{
         //this.session.getAsyncRemote().sendText(message);
     }
 
+    public static void sendAll(String message) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        String msgTime = simpleDateFormat.format(new Date());
+
+        for (ChatSocket chatSocket : chatSockets) {
+            try {
+                chatSocket.sendMessage("系统消息:&nbsp;&nbsp;" + msgTime + "\n" + message);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+    }
+
     @OnError
     public void onError(Session session, Throwable error) {
         logger.info("A error happend");
@@ -140,6 +160,11 @@ public class ChatSocket{
         ChatSocket.onlineCount--;
     }
 
+    public StringRedisTemplate getStringRedisTemplate() {
+        return stringRedisTemplate;
+    }
 
-
+    public void setStringRedisTemplate(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
 }
