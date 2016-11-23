@@ -1,0 +1,12 @@
+package top.onos;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class RedisInPractiseApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(RedisInPractiseApplication.class, args);
+	}
+}
