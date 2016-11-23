@@ -20,6 +20,7 @@
         $(".btn-info").click(function () {
             var msg = $("#msgBox").val();
             sock.send(msg);
+            $("#msgBox").val("");
         });
 
         $(".btn-danger").click(function () {

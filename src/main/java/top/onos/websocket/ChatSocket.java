@@ -55,6 +55,13 @@ public class ChatSocket{
         subOnlineCount();
         String id = session.getId();
         logger.info(id + "  offline");
+        for (ChatSocket chatSocket : chatSockets) {
+            try {
+                chatSocket.sendMessage("第"+id+"位游客离开聊天室\n");
+            } catch (Exception e) {
+                continue;
+            }
+        }
     }
 
     @OnMessage
@@ -62,27 +69,39 @@ public class ChatSocket{
         logger.info("A message received");
         logger.info(message);
         logger.info(session.toString());
-/*        try {
-            session.getBasicRemote().sendText(message);
-//            this.session.getBasicRemote().sendText("Send a message");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
 
         String msgTime = simpleDateFormat.format(new Date());
 
-        for (ChatSocket chatSocket : chatSockets) {
-            try {
-                String id = session.getId();
-                chatSocket.sendMessage("第" + id + "位游客:&nbsp;&nbsp;" + msgTime + "\n" + message);
-            } catch (Exception e) {
-                continue;
+        String toId = "";
+        if (message != null && !message.trim().isEmpty()) {
+            int num = message.split("/").length;
+            if (num > 1) {
+                toId = message.split("/")[0];
+                if (toId != null && !toId.trim().isEmpty()) {
+                    for (ChatSocket chatSocket : chatSockets) {
+                        try {
+                            if (chatSocket.session.getId().equals(toId)) {
+                                chatSocket.sendMessage("第" + session.getId() + "位游客:&nbsp;&nbsp;" + msgTime + "\n" + message);
+                            }
+                        } catch (Exception e) {
+                            continue;
+                        }
+                    }
+
+                }
+            } else {
+                for (ChatSocket chatSocket : chatSockets) {
+                    try {
+                        String id = session.getId();
+                        chatSocket.sendMessage("第" + id + "位游客:&nbsp;&nbsp;" + msgTime + "\n" + message);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
             }
         }
-
-
     }
 
     public void sendMessage(String message) throws IOException {
