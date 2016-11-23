@@ -1,13 +1,9 @@
 package top.onos.config;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import top.onos.domain.Receiver;
@@ -38,7 +34,7 @@ public class RedisConfig {
                                             MessageListenerAdapter messageListenerAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(messageListenerAdapter, new PatternTopic("chat"));
+        container.addMessageListener(messageListenerAdapter, new ChannelTopic("chat-*"));
         return  container;
     }
 
